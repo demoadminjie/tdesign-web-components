@@ -13,14 +13,6 @@ export default class TagInput extends Component<TagInputProps> {
     /* Add your custom styles here */
   `;
 
-  constructor() {
-    super();
-    this.props = {
-      value: [],
-      ...this.props,
-    };
-  }
-
   static defaultProps = {
     placeholder: '请输入',
   };
@@ -31,13 +23,29 @@ export default class TagInput extends Component<TagInputProps> {
 
   value: TagInputValue = [];
 
+  label = this.props.label || '';
+
+  static get properties() {
+    return {
+      value: Array,
+    };
+  }
+
   addTag(value: string) {
     this.value.push(value);
+    // this.props?.onChange &&
+    //   this.props?.onChange(this.value, {
+    //     trigger: 'enter',
+    //     index: this.value.length - 1,
+    //     item: value,
+    //   });
+    this.fire('change', this.value);
     this.update();
   }
 
   removeTag(index: number) {
     this.value.splice(index, 1);
+    this.fire('change', this.value);
     this.update();
   }
 
@@ -57,11 +65,27 @@ export default class TagInput extends Component<TagInputProps> {
     this.removeTag(index);
   };
 
+  onInputPaste = (e: ClipboardEvent) => {
+    this.props.onPaste && this.props.onPaste(e);
+  };
+
   render(props: TagInputProps) {
+    this.value = props.value || props.defaultValue || this.value;
     return (
       <div class="t-input__wrap t-tag-input">
         <div class="t-input t-input--prefix">
-          {this.value.map((tag, index) => (
+          {this.label && <div class="t-tag-input__prefix">{this.label}</div>}
+          {console.log(
+            'value',
+            this.value,
+            'props.value',
+            props.value,
+            'props.defaultValue',
+            props.defaultValue,
+            'this.value',
+            this.value,
+          )}
+          {(props.value || this.value).map((tag, index) => (
             <t-tag text={tag} onClose={() => this.onTagRemove(index)} />
           ))}
           <input
@@ -70,6 +94,7 @@ export default class TagInput extends Component<TagInputProps> {
             value={this.inputValue}
             onInput={this.onInputChange}
             onKeyPress={this.onInputEnter}
+            onPaste={this.onInputPaste}
             placeholder={this.value.length === 0 && props.placeholder}
           />
         </div>

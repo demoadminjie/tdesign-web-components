@@ -10,6 +10,8 @@ spline: base
 
 {{ base }}
 
+{{ controlled }}
+
 ## API
 
 ### Button Props
