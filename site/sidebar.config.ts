@@ -112,6 +112,12 @@ export default [
     type: 'component', // 组件文档
     children: [
       {
+        title: 'Input 输入框',
+        name: 'input',
+        path: '/components/input',
+        component: () => import('tdesign-web-components/input/README.md'),
+      },
+      {
         title: 'Select 选择器',
         name: 'select',
         path: '/components/select',
@@ -176,7 +182,7 @@ export default [
         title: 'Tag 标签',
         name: 'tag',
         path: '/components/tag',
-        // component: () => import('tdesign-web-components/tag/README.md'),
+        component: () => import('tdesign-web-components/tag/README.md'),
       },
       {
         title: 'Image 图片',

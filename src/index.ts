@@ -16,5 +16,6 @@ export * from './slider';
 export * from './space';
 export * from './switch';
 export * from './tag-input';
+export * from './tag';
 export * from './textarea';
 export * from './tooltip';
