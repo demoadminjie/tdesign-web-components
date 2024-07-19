@@ -1,11 +1,10 @@
-import { h, tag, WeElement } from 'omi';
+import { Component } from 'omi';
 
 import '../index';
 import '../../space';
 import '../../popup';
 
-@tag('tag-input-diy')
-export default class TagInputDiy extends WeElement {
+export default class TagInputDiy extends Component {
   tags = ['StudentA', 'StudentB', 'StudentC'];
 
   render() {

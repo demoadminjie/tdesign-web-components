@@ -1,10 +1,9 @@
-import { h, tag, WeElement } from 'omi';
+import { Component } from 'omi';
 
 import '../index';
 import '../../space';
 
-@tag('tag-input-theme')
-export default class TagInputTheme extends WeElement {
+export default class TagInputTheme extends Component {
   tags = ['Vue', 'React', 'Miniprogram'];
 
   render() {

@@ -1,10 +1,9 @@
-import { h, tag, WeElement } from 'omi';
+import { Component } from 'omi';
 
 import '../index';
-import '../../message';
+// import '../../message';
 
-@tag('tag-input-limit')
-export default class TagInputLimit extends WeElement {
+export default class TagInputLimit extends Component {
   tags = [];
 
   render() {

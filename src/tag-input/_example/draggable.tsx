@@ -1,10 +1,9 @@
-import { h, tag, WeElement } from 'omi';
+import { Component } from 'omi';
 
 import '../index';
 import '../../space';
 
-@tag('tag-input-drag')
-export default class TagInputDrag extends WeElement {
+export default class TagInputDrag extends Component {
   tags1 = ['Vue', 'React', 'Angular'];
   tags2 = ['Vue', 'React', 'Angular', 'Miniprogram'];
 

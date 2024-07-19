@@ -1,10 +1,7 @@
-import { h, tag, WeElement } from 'omi';
+import { Component } from 'omi';
 
 import '../index';
-import '../../message';
-
-@tag('tag-input-auto')
-export default class TagInputAuto extends WeElement {
+export default class TagInputAuto extends Component {
   tags = ['Vue', 'React'];
 
   render() {

@@ -1,10 +1,9 @@
-import { h, tag, WeElement } from 'omi';
+import { Component } from 'omi';
 
 import '../index';
 import '../../space';
 
-@tag('tag-input-excess')
-export default class TagInputExcess extends WeElement {
+export default class TagInputExcess extends Component {
   tags1 = ['Vue', 'React'];
 
   render() {

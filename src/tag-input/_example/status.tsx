@@ -1,12 +1,10 @@
-import { h, tag, WeElement } from 'omi';
+import { Component } from 'omi';
 
 import '../index';
 import '../../space';
 import '../../popup';
-import { block } from 'rules';
 
-@tag('tag-input-status')
-export default class TagInputStatus extends WeElement {
+export default class TagInputStatus extends Component {
   tags1 = ['Vue', 'React', 'Miniprogram'];
   tags2 = ['Vue', 'React', 'Miniprogram'];
   tags3 = ['Vue', 'React', 'Miniprogram'];

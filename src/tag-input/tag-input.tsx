@@ -466,8 +466,8 @@ export default class TagInput extends Component<TagInputProps> {
                 {...getDragProps?.(index, item)}
                 {...props.tagProps}
                 // 因为生成的 html 代码中，style 会应用在 <t-tag> 和 内部的 span 中，所以需要一个元素设置一半的 padding
-                style={{ padding: '0px calc(var(--td-comp-paddingLR-s)/2)' }}
-                className={classNames(`${classPrefix}-tag ${classPrefix}-tag--default`)}
+                style={{ marginLeft: 0, marginRight: 0, padding: '0px calc(var(--td-comp-paddingLR-s)/2)' }}
+                className={classNames(`${classPrefix}-tag`)}
               >
                 {tagContent ?? item}
               </t-tag>

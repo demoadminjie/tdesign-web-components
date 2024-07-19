@@ -1,10 +1,9 @@
-import { h, tag, WeElement } from 'omi';
+import { Component } from 'omi';
 
 import '../index';
 import '../../space';
 
-@tag('tag-input-size')
-export default class TagInputSize extends WeElement {
+export default class TagInputSize extends Component {
   tags1 = ['Vue', 'React'];
   tags2 = ['Vue', 'React'];
   tags3 = ['Vue', 'React'];
