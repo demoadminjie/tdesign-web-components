@@ -147,6 +147,12 @@ export default [
         path: '/components/textarea',
         component: () => import('tdesign-web-components/textarea/README.md'),
       },
+      {
+        title: 'TagInput 标签输入框',
+        name: ' tag-input',
+        path: '/components/tag-input',
+        component: () => import('tdesign-web-components/tag-input/README.md'),
+      },
     ],
   },
   {
