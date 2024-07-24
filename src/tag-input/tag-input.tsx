@@ -2,16 +2,11 @@ import 'tdesign-icons-web-components/esm/components/close-circle-filled';
 
 import { Component, createRef, OmiProps, tag } from 'omi';
 import { TagInputValue, TdTagInputProps } from './type';
-// import { TagInputChangeContext, TagInputValue, TdTagInputProps } from './type';
-// import { TdTagInputProps } from './type'
 import classNames, { getClassPrefix } from '../_util/classname';
-import { StyledProps, TNode } from '../common';
-// import useTagList from './useTagList'
-// import useDragSorter from '../utils/userDragSorter';
+import { StyledProps } from '../common';
 import '../input';
 import '../tag';
 import { InputValue } from '../input';
-// import TInput, { InputValue, InputRef } from '../input'
 
 const classPrefix = getClassPrefix();
 
@@ -49,17 +44,10 @@ interface DragSortContext<T> {
   target: T;
 }
 
-const isFunction = (arg: string | TNode | ((params: any) => string | TNode)): arg is (params: any) => string | TNode =>
-  typeof arg === 'function';
+const isFunction = (arg: unknown) => typeof arg === 'function';
 
 @tag('t-tag-input')
 export default class TagInput extends Component<TagInputProps> {
-  // static css = `
-  // .${classPrefix}-tag-input .${classPrefix}-tag {
-  //   padding: 0 !important;
-  // }
-  // `;
-
   static defaultProps = {
     autoWidth: false,
     clearable: false,
@@ -102,9 +90,9 @@ export default class TagInput extends Component<TagInputProps> {
   };
 
   install() {
-    // console.log(this.props.inputProps)
     this.tagInputRef = createRef();
-    this.tagValue = this.props.value ? this.props.value : this.props.defaultValue;
+    this.isCompositionRef = createRef();
+    this.tagValue = this.props?.defaultValue || [];
     this.draggingIndex = -1;
     this.dragStartData = null;
     this.isDropped = null;
@@ -127,6 +115,8 @@ export default class TagInput extends Component<TagInputProps> {
   isDropped;
   startInfo;
 
+  isCompositionRef;
+
   updateScrollElement = (element) => {
     this.scrollElement = element.current.children[0];
   };
@@ -134,36 +124,35 @@ export default class TagInput extends Component<TagInputProps> {
   updateScrollDistance = () => {
     if (!this.scrollElement) return;
     this.scrollDistance = this.scrollElement.scrollWidth - this.scrollElement.clientWidth;
-    // setScrollDistance(scrollElement.scrollWidth - scrollElement.clientWidth);
   };
 
-  scrollTo = (distance: number) => {
+  scrollTo = (options) => {
     if (isFunction(this.scrollElement?.scroll)) {
-      this.scrollElement.scroll({ left: distance, behavior: 'smooth' });
+      this.scrollElement.scroll({ left: options.x, behavior: 'smooth' });
     }
   };
 
   scrollToRight = () => {
     this.updateScrollDistance();
-    this.scrollTo(this.scrollDistance);
+    this.scrollTo({ x: this.scrollDistance, y: 0 });
   };
 
   scrollToLeft = () => {
-    this.scrollTo(0);
+    this.scrollTo({ x: 0, y: 0 });
   };
 
   // TODO：MAC 电脑横向滚动，Windows 纵向滚动。当前只处理了横向滚动
-  // onWheel = ({ e }: { e: WheelEvent<HTMLDivElement> }) => {
-  //   if (readonly || disabled) return;
-  //   if (!scrollElement) return;
-  //   if (e.deltaX > 0) {
-  //     const distance = Math.min(scrollElement.scrollLeft + 120, scrollDistance);
-  //     scrollTo(distance);
-  //   } else {
-  //     const distance = Math.max(scrollElement.scrollLeft - 120, 0);
-  //     scrollTo(distance);
-  //   }
-  // };
+  onWheel = ({ e }: { e: WheelEvent }) => {
+    if (this.props.readonly || this.props.disabled) return;
+    if (!this.scrollElement) return;
+    if (e?.deltaX && e.deltaX > 0) {
+      const distance = Math.min(this.scrollElement.scrollLeft + 120, this.scrollDistance);
+      this.scrollTo({ x: distance, y: 0 });
+    } else {
+      const distance = Math.max(this.scrollElement.scrollLeft - 120, 0);
+      this.scrollTo({ x: distance, y: 0 });
+    }
+  };
 
   // 鼠标 hover，自动滑动到最右侧，以便输入新标签
   scrollToRightOnEnter = () => {
@@ -217,14 +206,7 @@ export default class TagInput extends Component<TagInputProps> {
 
     function useDragSorter<T>(props: DragSortProps<T>): DragSortInnerProps {
       const { sortOnDraggable, onDragSort, onDragOverCheck } = props;
-      // const [draggingIndex, setDraggingIndex] = useState(-1);
-      // const [dragStartData, setDragStartData] = useState(null);
-      // const [isDropped, setIsDropped] = useState(null);
-      // const [startInfo, setStartInfo] = useState({ nodeX: 0, nodeWidth: 0, mouseX: 0 });
 
-      // const onDragSortRef = useRef(onDragSort);
-
-      // const onDragSortRef = createRef();
       const onDragOver = (e, index, record: T) => {
         e.preventDefault();
         if (that.draggingIndex === index || that.draggingIndex === -1) return;
@@ -258,53 +240,7 @@ export default class TagInput extends Component<TagInputProps> {
           targetIndex: index,
         });
         that.draggingIndex = index;
-        // setDraggingIndex(index);
       };
-
-      // const onDragOver = useCallback(
-      //   (e, index, record: T) => {
-      //     e.preventDefault();
-      //     if (draggingIndex === index || draggingIndex === -1) return;
-      //     if (onDragOverCheck?.targetClassNameRegExp && !onDragOverCheck?.targetClassNameRegExp.test(e.target?.className)) {
-      //       return;
-      //     }
-
-      //     if (onDragOverCheck?.x) {
-      //       if (!startInfo.nodeWidth) return;
-
-      //       const { x, width } = e.target.getBoundingClientRect();
-      //       const targetNodeMiddleX = x + width / 2;
-      //       const clientX = e.clientX || 0;
-      //       const draggingNodeLeft = clientX - (startInfo.mouseX - startInfo.nodeX);
-      //       const draggingNodeRight = draggingNodeLeft + startInfo.nodeWidth;
-
-      //       let overlap = false;
-      //       if (draggingNodeLeft > x && draggingNodeLeft < x + width) {
-      //         overlap = draggingNodeLeft < targetNodeMiddleX;
-      //       } else {
-      //         overlap = draggingNodeRight > targetNodeMiddleX;
-      //       }
-      //       if (!overlap) return;
-      //     }
-
-      //     onDragSortRef.current?.({
-      //       currentIndex: draggingIndex,
-      //       current: dragStartData,
-      //       target: record,
-      //       targetIndex: index,
-      //     });
-      //     setDraggingIndex(index);
-      //   },
-      //   [
-      //     draggingIndex,
-      //     onDragOverCheck?.targetClassNameRegExp,
-      //     onDragOverCheck?.x,
-      //     dragStartData,
-      //     startInfo.nodeWidth,
-      //     startInfo.mouseX,
-      //     startInfo.nodeX,
-      //   ],
-      // );
 
       if (!sortOnDraggable) {
         return {};
@@ -313,8 +249,6 @@ export default class TagInput extends Component<TagInputProps> {
       function onDragStart(e, index, record: T) {
         that.draggingIndex = index;
         that.dragStartData = record;
-        // setDraggingIndex(index);
-        // setDragStartData(record);
         if (onDragOverCheck) {
           const { x, width } = e.target.getBoundingClientRect();
           that.startInfo = {
@@ -322,11 +256,6 @@ export default class TagInput extends Component<TagInputProps> {
             nodeWidth: width,
             mouseX: e.clientX || 0,
           };
-          // setStartInfo({
-          //   nodeX: x,
-          //   nodeWidth: width,
-          //   mouseX: e.clientX || 0,
-          // });
         }
       }
 
@@ -341,9 +270,6 @@ export default class TagInput extends Component<TagInputProps> {
         that.isDropped = false;
         that.draggingIndex = -1;
         that.dragStartData = null;
-        // setIsDropped(false);
-        // setDraggingIndex(-1);
-        // setDragStartData(null);
       }
       function getDragProps(index, record: T) {
         if (sortOnDraggable) {
@@ -378,17 +304,19 @@ export default class TagInput extends Component<TagInputProps> {
       },
     });
 
-    const onClearClick = (e: MouseEvent) => {
-      // clearAll({ e });
-      // setTInputValue('', { e, trigger: 'clear' });
-      // props.onClear?.({ e });
+    const clearAll = (e) => {
+      that.tagValue = [];
+      that.tInputValue = '';
+      props?.onChange && props.onChange([], { e, trigger: 'clear' });
+      that.update();
     };
-    const tagValue = props.value ? props.value : props.defaultValue;
-    // const { tagValue, onClose, onInnerEnter, onInputBackspaceKeyUp, clearAll, renderLabel, onInputBackspaceKeyDown } =
-    // useTagList({
-    //   ...props,
-    //   // getDragProps,
-    // });
+
+    const onClearClick = (e: MouseEvent) => {
+      clearAll(e);
+      props.onClear?.({ e });
+    };
+
+    const tagValue = props?.value ? props.value : that.tagValue;
 
     // 自定义 Tag 节点
     const displayNode = isFunction(valueDisplay)
@@ -400,14 +328,15 @@ export default class TagInput extends Component<TagInputProps> {
 
     const onClose = (p: { e?: MouseEvent; index: number; item: string | number }) => {
       const arr = [...tagValue];
-      arr.splice(p.index, 1);
-      tagValue.splice(p.index, 1);
-      // setTagValue(arr, { trigger: 'tag-remove', ...p })
+      const item = arr.splice(p.index, 1);
+      that.tagValue.splice(p.index, 1);
       props?.onChange?.(arr, {
         ...p,
-        // trigger: 'tag-remove'
+        trigger: 'tag-remove',
       });
-      // onRemove?.({ ...p, trigger: 'tag-remove', value: arr })
+      props?.onRemove &&
+        props?.onRemove?.({ e: p?.e, index: p.index, item: p.item, trigger: 'tag-remove', value: arr });
+      that.update();
     };
 
     const onInnerEnter = (value: InputValue, context: { e: KeyboardEvent }) => {
@@ -421,10 +350,12 @@ export default class TagInput extends Component<TagInputProps> {
       if (!props.onEnter) {
         props.onChange?.(newValue, {
           ...context,
-          // trigger: 'enter'
+          trigger: 'enter',
         });
+        that.tagValue = newValue;
       }
       props?.onEnter?.(newValue, { ...context, inputValue: value });
+      that.update();
     };
 
     // 按下回退键，删除标签
@@ -433,27 +364,28 @@ export default class TagInput extends Component<TagInputProps> {
       const { e } = context;
       if (!tagValue || !tagValue.length) return;
       // 回车键删除，输入框值为空时，才允许 Backspace 删除标签
-      if (!this.tInputValue && ['Backspace', 'NumpadDelete'].includes(e.key)) {
+      if (!that.tInputValue && ['Backspace', 'NumpadDelete'].includes(e.key)) {
         const index = tagValue.length - 1;
         const item = tagValue[index];
         const trigger = 'backspace';
         const newValue = tagValue.slice(0, -1);
-        props.onChange(newValue, { e, index, item, trigger });
-        // setTagValue(newValue, { e, index, item, trigger });
-        props.onRemove?.({ e, index, item, trigger, value: newValue });
+        that.tagValue = newValue;
+        props?.onChange && props?.onChange(newValue, { e, index, item, trigger });
+        props?.onRemove && props?.onRemove?.({ e, index, item, trigger, value: newValue });
+        that.update();
       }
     };
 
     const onInputBackspaceKeyUp = (value: InputValue) => {
       if (!tagValue || !tagValue.length) return;
-      this.tInputValue = value;
+      that.tInputValue = value;
       that.update();
     };
 
     const renderLabel = ({ displayNode, label }) => {
       const newList = props.minCollapsedNum ? tagValue.slice(0, props.minCollapsedNum) : tagValue;
       const list = displayNode
-        ? [<>{displayNode}</>]
+        ? displayNode
         : newList?.map((item, index) => {
             const tagContent = isFunction(props.tag) ? props.tag({ value: item }) : props.tag;
             return (
@@ -486,6 +418,8 @@ export default class TagInput extends Component<TagInputProps> {
           value: tagValue,
           count: tagValue.length - props.minCollapsedNum,
           collapsedTags: tagValue.slice(props.minCollapsedNum, tagValue.length),
+          collapsedSelectedItems: tagValue.slice(props.minCollapsedNum, tagValue.length),
+          onClose,
         };
         const more = isFunction(props.collapsedItems) ? props.collapsedItems(params) : props.collapsedItems;
         if (more) {
@@ -499,7 +433,7 @@ export default class TagInput extends Component<TagInputProps> {
 
     const tagInputPlaceholder = !tagValue?.length ? placeholder : '';
 
-    const showClearIcon = Boolean(!readonly && !disabled && clearable && this.isHover && tagValue?.length);
+    const showClearIcon = Boolean(!readonly && !disabled && clearable && that.isHover && tagValue?.length);
 
     const suffixIconNode = showClearIcon ? (
       <t-icon-close-circle-filled
@@ -511,13 +445,11 @@ export default class TagInput extends Component<TagInputProps> {
     );
 
     const isEmpty = !(Array.isArray(tagValue) && tagValue.length);
-    const cls = () => {
-      return classNames();
-    };
+
     const classes = [
       `${classPrefix}-tag-input`,
       {
-        [TagInputClassNamePrefix(`--break-line`)]: this.props.excessTagsDisplayType === 'break-line',
+        [TagInputClassNamePrefix(`--break-line`)]: excessTagsDisplayType === 'break-line',
         [TagInputClassNamePrefix(`__with-suffix-icon`)]: !!suffixIconNode,
         [`${classPrefix}-is-empty`]: isEmpty,
         [TagInputClassNamePrefix(`--with-tag`)]: !isEmpty,
@@ -525,18 +457,27 @@ export default class TagInput extends Component<TagInputProps> {
       props.className,
     ];
 
-    const onInputEnter = (value: InputValue, context: { e: KeyboardEvent }) => {
-      onInnerEnter(value, context);
-      // setTInputValue('', { e: context.e, trigger: 'enter' });
-      // !isCompositionRef.current && onInnerEnter(value, context);
-      this.scrollToRight();
+    const onInputCompositionstart = (value: string, context: { e: CompositionEvent }) => {
+      that.isCompositionRef.current = true;
+      inputProps?.onCompositionstart?.(value, context);
     };
 
-    // (() => console.log(renderLabel({ displayNode, label })))()
-    // if(icon){
-    //   icon.attributes['style'] = {}
-    //   icon.attributes.style['marginRight'] = 4
-    // }
+    const onInputCompositionend = (value: string, context: { e: CompositionEvent }) => {
+      that.isCompositionRef.current = false;
+      inputProps?.onCompositionend?.(value, context);
+    };
+
+    const onInnerClick = (context: { e: MouseEvent }) => {
+      if (!props.disabled && !props.readonly) {
+        (that.tagInputRef.current as any).inputElement?.focus?.();
+      }
+      onClick?.(context);
+    };
+
+    const onInputEnter = (value: InputValue, context: { e: KeyboardEvent }) => {
+      onInnerEnter(value, context);
+      that.scrollToRight();
+    };
 
     const addHover = (context) => {
       if (readonly || disabled) return;
@@ -551,24 +492,23 @@ export default class TagInput extends Component<TagInputProps> {
       that.update();
       onMouseleave?.(context);
     };
-    // (()=>{console.log(this.tInputValue)})();
+
     return (
       <t-input
         ref={that.tagInputRef}
         value={that.tInputValue}
         onChange={(val, context) => {
-          // console.log(val)
-          this.tInputValue = val;
-          this.update();
+          that.tInputValue = val;
+          that.update();
         }}
         autoWidth={true} // 控制input_inner的宽度 设置为true让内部input不会提前换行
-        // onWheel={onWheel}
+        onWheel={that.onWheel}
         size={size}
         readonly={readonly}
         disabled={disabled}
         label={renderLabel({ displayNode, label })}
         className={classes}
-        // style={props.style}
+        style={props.style}
         tips={tips}
         status={status}
         placeholder={tagInputPlaceholder}
@@ -576,32 +516,31 @@ export default class TagInput extends Component<TagInputProps> {
         suffixIcon={suffixIconNode}
         showInput={!inputProps?.readonly || !tagValue || !tagValue?.length}
         keepWrapperWidth={!autoWidth}
-        // onPaste={onPaste}
-        // onClick={onInnerClick}
+        onPaste={onPaste}
+        onClick={onInnerClick}
         onEnter={onInputEnter}
         onMyKeydown={onInputBackspaceKeyDown}
         onMyKeyup={onInputBackspaceKeyUp}
         onMouseenter={(context) => {
           addHover(context);
-          this.scrollToRightOnEnter();
+          that.scrollToRightOnEnter();
         }}
         onMouseleave={(context) => {
           cancelHover(context);
-          this.scrollToLeftOnLeave();
+          that.scrollToLeftOnLeave();
         }}
-        // onFocus={(inputValue, context) => {
-        //   onFocus?.(tagValue, { e: context.e, inputValue });
-        // }}
+        onFocus={(inputValue, context) => {
+          onFocus?.(tagValue, { e: context.e, inputValue });
+        }}
         onBlur={(tInputValue, context) => {
-          console.log(tInputValue, 'onblur');
           if (tInputValue) {
-            this.tInputValue = '';
-            this.update();
+            that.tInputValue = '';
+            that.update();
           }
           onBlur?.(tagValue, { e: context.e, inputValue: '' });
         }}
-        // onCompositionstart={onInputCompositionstart}
-        // onCompositionend={onInputCompositionend}
+        onCompositionstart={onInputCompositionstart}
+        onCompositionend={onInputCompositionend}
         {...inputProps}
       />
     );

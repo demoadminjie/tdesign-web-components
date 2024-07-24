@@ -23,13 +23,13 @@ export default class TagInputDiy extends Component {
           clearable
           minCollapsedNum={2}
           tag={({ value }) => (
-            <span>
+            <div style={{ display: 'flex' }}>
               <img
                 src="https://tdesign.gtimg.com/site/avatar.jpg"
                 style={{ maxWidth: '18px', maxHeight: '18px', borderRadius: '50%', verticalAlign: 'text-top' }}
               />
               {value}
-            </span>
+            </div>
           )}
         ></t-tag-input>
 
@@ -39,7 +39,7 @@ export default class TagInputDiy extends Component {
           valueDisplay={({ value, onClose }) =>
             value.map((item, index) => (
               <t-tag key={item} closable style={{ marginRight: '4px' }} onClose={() => onClose(index)}>
-                <div>
+                <div style={{ display: 'flex' }}>
                   <img
                     src="https://tdesign.gtimg.com/site/avatar.jpg"
                     style={{ maxWidth: '18px', maxHeight: '18px', borderRadius: '50%', verticalAlign: 'text-top' }}
